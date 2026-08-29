@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ContentPage
+    x:Class="EmotionCalendarDiary.Views.DiaryEntryPage"
+    x:Name="PageRoot"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:vm="clr-namespace:EmotionCalendarDiary.ViewModels"
+    xmlns:conv="clr-namespace:EmotionCalendarDiary.Converters"
+    x:DataType="vm:DiaryEntryViewModel"
+    Title="{Binding SelectedDate, StringFormat='{0:yyyy년 M월 d일}'}">
+
+    <ContentPage.Resources>
+        <conv:BoolToSelectionColorConverter x:Key="SelectionColorConverter" />
+        <conv:StringNotEmptyConverter x:Key="StringNotEmptyConverter" />
+    </ContentPage.Resources>
+
+    <ScrollView>
+        <VerticalStackLayout Padding="16" Spacing="16">
+
+            <Label Text="오늘의 감정" FontAttributes="Bold" FontSize="16" />
+            <CollectionView ItemsSource="{Binding Emotions}" HeightRequest="180">
+                <CollectionView.ItemsLayout>
+                    <GridItemsLayout Orientation="Vertical" Span="5" />
+                </CollectionView.ItemsLayout>
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="vm:EmotionOption">
+                        <Border Margin="3" Padding="4"
+                                BackgroundColor="{Binding IsSelected, Converter={StaticResource SelectionColorConverter}}">
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer
+                                    Command="{Binding Source={x:Reference PageRoot}, Path=BindingContext.SelectEmotionCommand}"
+                                    CommandParameter="{Binding .}" />
+                            </Border.GestureRecognizers>
+                            <VerticalStackLayout HorizontalOptions="Center">
+                                <Label Text="{Binding Emoji}" FontSize="24" HorizontalOptions="Center" />
+                                <Label Text="{Binding Label}" FontSize="11" HorizontalOptions="Center" />
+                            </VerticalStackLayout>
+                        </Border>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+
+            <Label Text="일기" FontAttributes="Bold" FontSize="16" />
+            <Editor Text="{Binding Body}" AutoSize="TextChanges" MinimumHeightRequest="120"
+                    Placeholder="오늘 있었던 일을 적어보세요" />
+
+            <Label Text="사진" FontAttributes="Bold" FontSize="16" />
+            <Image Source="{Binding PhotoPath}" HeightRequest="160" Aspect="AspectFit"
+                   IsVisible="{Binding PhotoPath, Converter={StaticResource StringNotEmptyConverter}}" />
+            <HorizontalStackLayout Spacing="8">
+                <Button Text="사진 선택" Command="{Binding PickPhotoCommand}" />
+                <Button Text="사진 촬영" Command="{Binding CapturePhotoCommand}"
+                        IsVisible="{Binding CanCapturePhoto}" />
+            </HorizontalStackLayout>
+
+            <Label Text="원인 태그" FontAttributes="Bold" FontSize="16" />
+            <CollectionView ItemsSource="{Binding Tags}" HeightRequest="50">
+                <CollectionView.ItemsLayout>
+                    <GridItemsLayout Orientation="Vertical" Span="4" />
+                </CollectionView.ItemsLayout>
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="vm:TagOption">
+                        <Border Margin="3" Padding="6"
+                                BackgroundColor="{Binding IsSelected, Converter={StaticResource SelectionColorConverter}}">
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer
+                                    Command="{Binding Source={x:Reference PageRoot}, Path=BindingContext.ToggleTagCommand}"
+                                    CommandParameter="{Binding .}" />
+                            </Border.GestureRecognizers>
+                            <Label Text="{Binding Label}" HorizontalOptions="Center" FontSize="12" />
+                        </Border>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+
+            <HorizontalStackLayout Spacing="8">
+                <Label Text="친구에게 공개" VerticalOptions="Center" />
+                <Switch IsToggled="{Binding IsPublic}" />
+            </HorizontalStackLayout>
+
+            <HorizontalStackLayout Spacing="8" HorizontalOptions="End">
+                <Button Text="삭제" Command="{Binding DeleteCommand}" IsVisible="{Binding IsExistingEntry}"
+                        BackgroundColor="IndianRed" TextColor="White" />
+                <Button Text="취소" Command="{Binding CancelCommand}" />
+                <Button Text="저장" Command="{Binding SaveCommand}" BackgroundColor="MediumPurple" TextColor="White" />
+            </HorizontalStackLayout>
+
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>
