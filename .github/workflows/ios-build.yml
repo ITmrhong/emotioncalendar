@@ -21,7 +21,7 @@ jobs:
         run: dotnet workload install maui-ios
 
       - name: Restore
-        run: dotnet restore EmotionCalendarDiary.csproj -f net8.0-ios
+        run: dotnet restore EmotionCalendarDiary.csproj -p:TargetFramework=net8.0-ios
 
       - name: Build for iOS Simulator (arm64)
         run: >
